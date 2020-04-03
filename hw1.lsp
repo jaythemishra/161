@@ -56,6 +56,7 @@
               (list (LIST2BTREE (first split_list))
                     (LIST2BTREE (second split_list)))))))
 
+; Returns a list containing all the leaf nodes of the binary tree TREE, which can be either a number or a list.
 (defun BTREE2LIST (TREE)
   (cond ((atom TREE) (list TREE))
         ((and (atom (first TREE))
@@ -63,3 +64,13 @@
             TREE)
         (t (append  (BTREE2LIST (first TREE))
                     (BTREE2LIST (second TREE))))))
+
+(defun IS-SAME (E1 E2)
+  (cond ((and (numberp E1)
+              (numberp E2))
+            (= E1 E2))
+        ((and (listp E1)
+              (listp E2))
+            (and  (IS-SAME (first E1) (first E2))
+                  (IS-SAME (rest E1) (rest E2))))
+        (t NIL)))
