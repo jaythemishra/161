@@ -55,3 +55,11 @@
         (t (let ((split_list (SPLIT-LIST LEAVES)))
               (list (LIST2BTREE (first split_list))
                     (LIST2BTREE (second split_list)))))))
+
+(defun BTREE2LIST (TREE)
+  (cond ((atom TREE) (list TREE))
+        ((and (atom (first TREE))
+              (atom (second TREE)))
+            TREE)
+        (t (append  (BTREE2LIST (first TREE))
+                    (BTREE2LIST (second TREE))))))
