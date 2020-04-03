@@ -39,9 +39,19 @@
                               (first even_split)) 
                       (second even_split)))))))
 
+; Returns the height of the binary tree TREE, which can either be a number or a list.
 (defun BTREE-HEIGHT (TREE)
   (cond ((atom TREE) 0)
-        (t  (let ((left (BTREE-HEIGHT (first TREE)))
-                  (right (BTREE-HEIGHT (second TREE))))
-              (cond ((> left right) (+ 1 left))
-                    (t (+ 1 right)))))))
+        (t  (let ((left_height (BTREE-HEIGHT (first TREE)))
+                  (right_height (BTREE-HEIGHT (second TREE))))
+              (cond ((> left_height right_height) (+ 1 left_height))
+                    (t (+ 1 right_height)))))))
+
+; Returns a list containing a binary tree representation of the leaves in list LEAVES.
+; The internal nodes in the returned binary tree will have 0 or 1 more leaves in their left branches than their right branches.
+(defun LIST2BTREE (LEAVES)
+  (cond ((= 1 (length LEAVES)) (first LEAVES))
+        ((= 2 (length LEAVES)) LEAVES)
+        (t (let ((split_list (SPLIT-LIST LEAVES)))
+              (list (LIST2BTREE (first split_list))
+                    (LIST2BTREE (second split_list)))))))
