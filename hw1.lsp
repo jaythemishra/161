@@ -1,3 +1,7 @@
+; Jay Mishra
+; UID 704925466
+; For TREE-CONTAINS, I first checked if TREE was an atom. If it was, I checked if it was equal to N. If tree wasn't an atom, I did some stuff
+
 ; Determines whether the first argument N of type number appears in the second argument TREE, which is an ordered tree that could be a number or a list.
 ; Returns t if N is in TREE, NIL otherwise.
 (defun TREE-CONTAINS (N TREE)
@@ -26,7 +30,7 @@
                     (SUB-LIST (rest L) START (- LEN 1))))))
 
 ; Returns a list of two lists that contain the elements of list L. The first element of the returned list is a list of length m.
-; The second element of the returned list of the length n. m - n = 1 or 0.
+; The second element of the returned list of the length n. m - n = 1 or 0. When appended, the first and second list together equal L.
 (defun SPLIT-LIST (L)
   (let ((len (length L)))
     (cond ((evenp len)
@@ -65,8 +69,12 @@
         (t (append  (BTREE2LIST (first TREE))
                     (BTREE2LIST (second TREE))))))
 
+; Returns whether the two arguments E1 and E2 are equivalent. E1 and E2 can either be numbers or lists.
 (defun IS-SAME (E1 E2)
-  (cond ((and (numberp E1)
+  (cond ((and (null E1)
+              (null E2))
+            t)
+        ((and (numberp E1)
               (numberp E2))
             (= E1 E2))
         ((and (listp E1)
