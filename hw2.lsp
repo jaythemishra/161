@@ -48,21 +48,51 @@
 ; NOTE that next-state returns a list containing the successor state (which is
 ; itself a list); the return should look something like ((1 1 T)).
 (defun next-state (s m c)
-  NIL)
+  (let* ((future_num_missionaries_on_current_boat_side (- (first s) m))
+        (future_num_cannibals_on_current_boat_side (- (second s) c))
+        (future_num_missionaries_on_current_other_side (- 3 future_num_missionaries_on_current_boat_side))
+        (future_num_cannibals_on_current_other_side (- 3 future_num_cannibals_on_current_boat_side)))
+    ;; (format t "CURRENT STATE: ~S~%" s)
+    ;; (format t "NUMBER OF MISSIONARIES TO TRANSPORT: ~S~%" m)
+    ;; (format t "NUMBER OF CANNIBALS TO TRANSPORT: ~S~%" c)
+    ;; (format t "FUTURE NUMBER OF MISSIONARIES ON CURRENT BOAT SIDE: ~S~%" future_num_missionaries_on_current_boat_side)
+    ;; (format t "FUTURE NUMBER OF CANNIBALS ON CURRENT BOAT SIDE: ~S~%" future_num_cannibals_on_current_boat_side)
+    ;; (format t "FUTURE NUMBER OF MISSIONARIES ON CURRENT OTHER SIDE: ~S~%" future_num_missionaries_on_current_other_side)
+    ;; (format t "FUTURE NUMBER OF CANNIBALS ON CURRENT OTHER SIDE: ~S~%" future_num_cannibals_on_current_other_side)
+    (cond ((or  (< future_num_missionaries_on_current_boat_side 0)
+                (< future_num_cannibals_on_current_boat_side 0)
+                (and  (> future_num_missionaries_on_current_boat_side 0)
+                      (< future_num_missionaries_on_current_boat_side future_num_cannibals_on_current_boat_side))
+                (and  (> future_num_missionaries_on_current_other_side 0)
+                      (< future_num_missionaries_on_current_other_side future_num_cannibals_on_current_other_side)))
+              ;; (print "INVALID") (terpri)
+              NIL)
+          (t
+            ;; (print "VALID") (terpri)
+            (list (list future_num_missionaries_on_current_other_side
+                        future_num_cannibals_on_current_other_side
+                        (not (third s))))))))
 
 ; SUCC-FN returns all of the possible legal successor states to the current
 ; state. It takes a single argument (s), which encodes the current state, and
 ; returns a list of each state that can be reached by applying legal operators
 ; to the current state.
 (defun succ-fn (s)
-  NIL)
+  (append (next-state s 0 1)
+          (next-state s 0 2)
+          (next-state s 1 0)
+          (next-state s 1 1)
+          (next-state s 2 0)
+  ))
 
 ; ON-PATH checks whether the current state is on the stack of states visited by
 ; this depth-first search. It takes two arguments: the current state (s) and the
 ; stack of states visited by MC-DFS (states). It returns T if s is a member of
 ; states and NIL otherwise.
 (defun on-path (s states)
-  NIL)
+  (cond ((null states) NIL)
+        ((equal s (first states)) t)
+        (t (on-path s (rest states)))))
 
 ; MULT-DFS is a helper function for MC-DFS. It takes two arguments: a stack of
 ; states from the initial state to the current state (path), and the legal
@@ -108,7 +138,7 @@
   (cond ((atom tree) (list tree))
         ((and (atom (first tree))
               (null (rest tree)))
-          tree)
+            tree)
         ((atom (first tree)) (append  (list (first tree)) 
                                       (bfs (rest tree))))
         (t (bfs (append (rest tree)
