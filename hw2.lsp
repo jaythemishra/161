@@ -103,7 +103,10 @@
 ; NIL. 
 ; Note that the path should be ordered as: (S_n ... S_2 S_1 S_0)
 (defun mult-dfs (states path)
-  NIL)
+  ;; (format t "CALLED MULT-DFS with states: ~S~% and path: ~S~%" states path)
+  (cond ((null states) NIL)
+        (t (or  (mc-dfs (first states) path)
+                (mult-dfs (rest states) path)))))
 
 ; MC-DFS does a depth first search from a given state to the goal state. It
 ; takes two arguments: a state (S) and the path from the initial state to S
@@ -114,7 +117,13 @@
 ; ensuring that the depth-first search does not revisit a node already on the
 ; search path.
 (defun mc-dfs (s path)
-  NIL)
+  ;; (format t "CALLED MC-DFS with state: ~S~% and path: ~S~%" s path)
+  (cond ((final-state s) (cons s path))
+        ((and (equal s '(3 3 T))
+              (not (null path)))
+            NIL)
+        ((on-path s path) NIL)
+        (t (mult-dfs (succ-fn s) (cons s path)))))
 
 
 
@@ -139,8 +148,8 @@
         ((and (atom (first tree))
               (null (rest tree)))
             tree)
-        ((atom (first tree)) (append  (list (first tree)) 
-                                      (bfs (rest tree))))
+        ((atom (first tree)) (cons  (first tree) 
+                                    (bfs (rest tree))))
         (t (bfs (append (rest tree)
                         (first tree))))))
 
@@ -154,7 +163,7 @@
   (cond ((or (null tree) (< depth 0)) NIL)
         ((atom tree) (list tree))
         (t (append  (dfid_search (first tree) (- depth 1))
-                    (dfid_search (rest tree) depth)))))
+                    (dfid_search (rest tree) depth)))))                                           
 
 (defun dfid (tree max_depth)
   (cond ((< max_depth 1) NIL)
