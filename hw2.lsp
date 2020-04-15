@@ -52,13 +52,6 @@
         (future_num_cannibals_on_current_boat_side (- (second s) c))
         (future_num_missionaries_on_current_other_side (- 3 future_num_missionaries_on_current_boat_side))
         (future_num_cannibals_on_current_other_side (- 3 future_num_cannibals_on_current_boat_side)))
-    ;; (format t "CURRENT STATE: ~S~%" s)
-    ;; (format t "NUMBER OF MISSIONARIES TO TRANSPORT: ~S~%" m)
-    ;; (format t "NUMBER OF CANNIBALS TO TRANSPORT: ~S~%" c)
-    ;; (format t "FUTURE NUMBER OF MISSIONARIES ON CURRENT BOAT SIDE: ~S~%" future_num_missionaries_on_current_boat_side)
-    ;; (format t "FUTURE NUMBER OF CANNIBALS ON CURRENT BOAT SIDE: ~S~%" future_num_cannibals_on_current_boat_side)
-    ;; (format t "FUTURE NUMBER OF MISSIONARIES ON CURRENT OTHER SIDE: ~S~%" future_num_missionaries_on_current_other_side)
-    ;; (format t "FUTURE NUMBER OF CANNIBALS ON CURRENT OTHER SIDE: ~S~%" future_num_cannibals_on_current_other_side)
     (cond ((or  (< future_num_missionaries_on_current_boat_side 0)
                 (< future_num_cannibals_on_current_boat_side 0)
                 (and  (> future_num_missionaries_on_current_boat_side 0)
@@ -103,7 +96,6 @@
 ; NIL. 
 ; Note that the path should be ordered as: (S_n ... S_2 S_1 S_0)
 (defun mult-dfs (states path)
-  ;; (format t "CALLED MULT-DFS with states: ~S~% and path: ~S~%" states path)
   (cond ((null states) NIL)
         (t (or  (mc-dfs (first states) path)
                 (mult-dfs (rest states) path)))))
@@ -117,7 +109,6 @@
 ; ensuring that the depth-first search does not revisit a node already on the
 ; search path.
 (defun mc-dfs (s path)
-  ;; (format t "CALLED MC-DFS with state: ~S~% and path: ~S~%" s path)
   (cond ((final-state s) (cons s path))
         ((and (equal s '(3 3 T))
               (not (null path)))
@@ -143,6 +134,9 @@
 ; (succ-fn '(3 3 t)) -> ((0 1 NIL) (1 1 NIL) (0 2 NIL))
 ; (succ-fn '(1 1 t)) -> ((3 2 NIL) (3 3 NIL))
 
+;; Returns a list containing the leaves of a left to right breadth first search
+;; of the tree structure tree, which can be either a list of nodes or an atom,
+;; and is the only argument supplied to bfs.
 (defun bfs (tree)
   (cond ((atom tree) (list tree))
         ((and (atom (first tree))
@@ -153,18 +147,28 @@
         (t (bfs (append (rest tree)
                         (first tree))))))
 
+;; Returns a list containing the leaves of a left to right depth first search
+;; of the tree structure tree, which can be either a list of nodes or an atom,
+;; and is the only argument supplied to bfs.
 (defun dfs (tree)
   (cond ((atom tree) (list tree))
         ((= 1 (length tree)) (dfs (first tree)))
         (t (append  (dfs (rest tree))
                     (dfs (first tree))))))
-  
+
+;; Performs the depth first search part of the dfid algorithm and returns a list
+;; of the nodes visited in the order of a depth first search traversal.
+;; It takes the same arguments as the top level dfid function.
 (defun dfid_search (tree depth)
   (cond ((or (null tree) (< depth 0)) NIL)
         ((atom tree) (list tree))
         (t (append  (dfid_search (first tree) (- depth 1))
                     (dfid_search (rest tree) depth)))))                                           
 
+;; The top level function of the implementation of dfid. It takes two arguments, max_depth,
+;; which represents the maximum depth to which the algorithm should search, and tree,
+;; which represents a tree structure that is being searched and can be a list of nodes
+;; or an atom. This function calls dfid_search to do the actual depth first search.
 (defun dfid (tree max_depth)
   (cond ((< max_depth 1) NIL)
         (t (append  (dfid tree (- max_depth 1))
