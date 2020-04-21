@@ -41,8 +41,7 @@
 ; I found this easier than typing (load "filename") every time. 
 ;
 (defun reload()
-  (load "hw3.lsp")
-  )
+  (load "hw3.lsp"))
 
 ;
 ; For loading a-star.lsp.
@@ -55,8 +54,7 @@
 ;
 (defun reload-all()
   (reload)
-  (load-a-star)
-  )
+  (load-a-star))
 
 ;
 ; A shortcut function.
@@ -65,8 +63,7 @@
 ; 
 ;
 (defun sokoban (s h)
-  (a* s #'goal-test #'next-states h)
-  )
+  (a* s #'goal-test #'next-states h))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; end general utility functions
@@ -81,45 +78,38 @@
 (setq wall 1)
 (setq box 2)
 (setq keeper 3)
-(setq star 4)
-(setq boxstar 5)
-(setq keeperstar 6)
+(setq goal 4)
+(setq boxgoal 5)
+(setq keepergoal 6)
 
 ; Some helper functions for checking the content of a square
 (defun isBlank (v)
-  (= v blank)
-  )
+  (= v blank))
 
 (defun isWall (v)
-  (= v wall)
-  )
+  (= v wall))
 
 (defun isBox (v)
-  (= v box)
-  )
+  (= v box))
 
 (defun isKeeper (v)
-  (= v keeper)
-  )
+  (= v keeper))
 
-(defun isStar (v)
-  (= v star)
-  )
+(defun isGoal (v)
+  (= v star))
 
-(defun isBoxStar (v)
-  (= v boxstar)
-  )
+(defun isBoxGoal (v)
+  (= v boxgoal))
 
-(defun isKeeperStar (v)
-  (= v keeperstar)
-  )
+(defun isKeeperGoal (v)
+  (= v keepergoal))
 
 ;
 ; Helper function of getKeeperPosition
 ;
 (defun getKeeperColumn (r col)
   (cond ((null r) nil)
-	(t (if (or (isKeeper (car r)) (isKeeperStar (car r)))
+	(t (if (or (isKeeper (car r)) (isKeeperGoal (car r)))
 	       col
 	     (getKeeperColumn (cdr r) (+ col 1))
 	     );end if
@@ -168,6 +158,24 @@
 	);end cond
   );end 
 
+;; Returns true if the keeper is on a goal in the provided row, nil otherwise.
+(defun keeper-on-goal-row (row)
+	(cond ((= 0 (length row)) nil)
+        ((isKeeper (first row)) nil)
+        ((isKeeperGoal (first row)) t)
+	      (t (keeper-on-goal-row (rest row)))))
+
+(defun keeper-on-goal (s)
+  (cond ((= 0 (length s)) nil)
+        ((keeper-on-goal-row (first s)) t)
+        (t (keeper-on-goal (rest s)))))
+
+;; Returns the number of boxes not on a goal in the provided row.
+(defun num-boxes-not-on-goal (row)
+  (cond ((= 0 (length row)) 0)
+        ((isBox (first row)) (+ 1 (num-boxes-not-on-goal (rest row))))
+        (t (num-boxes-not-on-goal (rest row)))))
+
 ; EXERCISE: Modify this function to return true (t)
 ; if and only if s is a goal state of the game.
 ; (neither any boxes nor the keeper is on a non-goal square)
@@ -177,8 +185,7 @@
 ; terminate until the whole search space is exhausted.
 ;
 (defun goal-test (s)
-  nil
-  );end defun
+  (and (= 0 (h1 s)) (keeper-on-goal s)));end defun
 
 ; EXERCISE: Modify this function to return the list of 
 ; sucessor states of s.
@@ -201,26 +208,26 @@
 ;
 (defun next-states (s)
   (let* ((pos (getKeeperPosition s 0))
-	 (x (car pos))
-	 (y (cadr pos))
-	 ;x and y are now the coordinate of the keeper in s.
-	 (result nil)
-	 )
-    (cleanUpList result);end
-   );end let
-  );
+	      (x (car pos))
+        (y (cadr pos))
+        ;x and y are now the coordinate of the keeper in s.
+        (result nil)
+    )
+      (cleanUpList result);end
+  );end let
+);
 
 ; EXERCISE: Modify this function to compute the trivial 
 ; admissible heuristic.
 ;
-(defun h0 (s)
-  )
+(defun h0 (s) 0)
 
 ; EXERCISE: Modify this function to compute the 
 ; number of misplaced boxes in s.
 ;
 (defun h1 (s)
-  )
+  (cond ((= 0 (length s)) 0)
+        (t (+ (num-boxes-not-on-goal (first s)) (h1 (rest s))))))
 
 ; EXERCISE: Change the name of this function to h<UID> where
 ; <UID> is your actual student ID number. Then, modify this 
@@ -231,7 +238,7 @@
 ; The Lisp 'time' function can be used to measure the 
 ; running time of a function call.
 ;
-(defun hUID (s)
+(defun h704925466 (s)
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -433,9 +440,9 @@
 	((= s wall) (format t "#"))
 	((= s box) (format t "$"))
 	((= s keeper) (format t "@"))
-	((= s star) (format t "."))
-	((= s boxstar) (format t "*"))
-	((= s keeperstar) (format t "+"))
+	((= s goal) (format t "."))
+	((= s boxgoal) (format t "*"))
+	((= s keepergoal) (format t "+"))
 	(t (format t "|"))
 	);end cond
   )
