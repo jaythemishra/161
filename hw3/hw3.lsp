@@ -96,7 +96,7 @@
   (= v keeper))
 
 (defun isGoal (v)
-  (= v star))
+  (= v goal))
 
 (defun isBoxGoal (v)
   (= v boxgoal))
@@ -165,6 +165,7 @@
         ((isKeeperGoal (first row)) t)
 	      (t (keeper-on-goal-row (rest row)))))
 
+;; Returns true if the keeper is on a goal in the provided state s, nil otherwise.
 (defun keeper-on-goal (s)
   (cond ((= 0 (length s)) nil)
         ((keeper-on-goal-row (first s)) t)
@@ -208,14 +209,76 @@
 ;
 (defun next-states (s)
   (let* ((pos (getKeeperPosition s 0))
-	      (x (car pos))
-        (y (cadr pos))
+	      (y (car pos))
+        (x (cadr pos))
         ;x and y are now the coordinate of the keeper in s.
-        (result nil)
+        (result (list (try-move s x y "UP") (try-move s x y "DOWN") (try-move s x y "LEFT") (try-move s x y "RIGHT")))
     )
       (cleanUpList result);end
   );end let
 );
+
+;; Gets the integer value of the square on the given row and column on the given state s.
+;; If either the row or column numbers are invalid, this function returns the value for a wall.
+(defun get-square (s r c)
+  (cond ((or  (< r 0)
+              (< c 0)
+              (> r (- (length s) 1))
+              (> c (- (length (first s)) 1)))
+            wall)
+        (t (elt (elt s r) c))))
+
+;; Returns a new state with the original state having new value v at position (r, c)
+(defun set-square (s r c v)
+  (append (subseq s 0 r)
+          (list (let ((row (elt s r)))
+            (append (subseq row 0 c)
+                    (list v)
+                    (subseq row (+ 1 c)))))
+          (subseq s (+ 1 r))))
+
+(defun set-current-keeper-square (current_square s x y)
+  (cond ((isKeeper current_square) (set-square s x y blank))
+        ((isKeeperGoal current_square) (set-square s x y goal))
+        (t nil)))
+
+;; Tries to execute a move in a given direction. Returns the new state if the move is valid, nil otherwise.
+(defun try-move (s x y dir)
+  ;; (format t "X: ~D; Y: ~D; DIR: ~A" x y dir)
+  ;; (terpri)
+  (let* ( (next_x (cond ((equal dir "UP") (- x 1))
+                        ((equal dir "DOWN") (+ x 1))
+                        (t x)))
+          (next_y (cond ((equal dir "LEFT") (- y 1))
+                        ((equal dir "RIGHT") (+ y 1))
+                        (t y)))
+          (next_next_x (cond  ((equal dir "UP") (- x 2))
+                              ((equal dir "DOWN") (+ x 2))
+                              (t x)))
+          (next_next_y (cond  ((equal dir "LEFT") (- y 2))
+                              ((equal dir "RIGHT") (+ y 2))
+                              (t y)))
+          (square (get-square s next_x next_y))
+          (current_square (get-square s x y)))
+    (cond ((isWall square) nil)
+          ((isBlank square)
+            ;; move the keeper to this square
+            (let ((next_s (set-square s next_x next_y keeper)))
+              (set-current-keeper-square current_square next_s x y)))
+          ((isGoal square)
+            ;; move the keeper onto the goal
+            (let ((next_s (set-square s next_x next_y keepergoal)))
+              (set-current-keeper-square current_square next_s x y)))
+          ((or (isBox square) (isBoxGoal square))
+            ;; do all the complicated box stuff
+            (let ((next_square (get-square s next_next_x next_next_y)))
+              (cond ((or  (isBlank next_square)
+                          (isGoal next_square))
+                        (let* ((next_s (set-square s next_next_x next_next_y (cond ((isBlank next_square) box) (t boxgoal))))
+                              (next_next_s (set-square next_s next_x next_y (cond ((isBox square) keeper) (t keepergoal)))))
+                            (set-current-keeper-square current_square next_next_s x y)))
+                    (t nil))))
+          (t nil))))
 
 ; EXERCISE: Modify this function to compute the trivial 
 ; admissible heuristic.
@@ -238,8 +301,7 @@
 ; The Lisp 'time' function can be used to measure the 
 ; running time of a function call.
 ;
-(defun h704925466 (s)
-  )
+(defun h704925466 (s) 0)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
