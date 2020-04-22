@@ -302,7 +302,7 @@
 ; running time of a function call.
 ;
 ;; (defun h704925466 (s) (h1 s))
-(defun h704925466 (s) (box-in-corner s))
+(defun h704925466 (s) (+ (h1 s) (box-in-corner s)))
 
 (defun box-in-corner-row-util (s row r c)
   (cond ((= 0 (length row)) nil)
