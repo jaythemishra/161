@@ -311,7 +311,7 @@
             (let ((left (get-square s r (- c 1)))
                   (right (get-square s r (+ c 1)))
                   (up (get-square s (- r 1) c))
-                  (down (get-square s (+ r 1) c))
+                  (down (get-square s (+ r 1) c)))
                 (or (and (isWall left) (or (isWall up) (isWall down)))
                     (and (isWall right) (or (isWall up) (isWall down))))))
             t)
