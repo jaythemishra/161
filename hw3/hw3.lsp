@@ -237,6 +237,7 @@
                     (subseq row (+ 1 c)))))
           (subseq s (+ 1 r))))
 
+;; Sets the current square that the keeper is on to the correct value when the keeper moves off.
 (defun set-current-keeper-square (current_square s x y)
   (cond ((isKeeper current_square) (set-square s x y blank))
         ((isKeeperGoal current_square) (set-square s x y goal))
@@ -244,8 +245,6 @@
 
 ;; Tries to execute a move in a given direction. Returns the new state if the move is valid, nil otherwise.
 (defun try-move (s x y dir)
-  ;; (format t "X: ~D; Y: ~D; DIR: ~A" x y dir)
-  ;; (terpri)
   (let* ( (next_x (cond ((equal dir "UP") (- x 1))
                         ((equal dir "DOWN") (+ x 1))
                         (t x)))
@@ -287,7 +286,8 @@
 
 ; EXERCISE: Modify this function to compute the 
 ; number of misplaced boxes in s.
-;
+; h1 is an admissible heuristic, because the minimum number of moves to reach the solution
+; would equal the number of boxes not currently on goals.
 (defun h1 (s)
   (cond ((= 0 (length s)) 0)
         (t (+ (num-boxes-not-on-goal (first s)) (h1 (rest s))))))
@@ -301,7 +301,16 @@
 ; The Lisp 'time' function can be used to measure the 
 ; running time of a function call.
 ;
-(defun h704925466 (s) 0)
+(defun h704925466 (s) (h1 s))
+;; (defun h704925466 (s) (h_keeper_box_manhattan_distance s))
+
+
+;; (defun get-box-coords (s row)
+;;   (cond ((= 0 (length s)) nil)
+;;         (t (append (get-box-coords-row (first s))) (get-box-coords (rest s)))))
+
+;; (defun h_keeper_box_manhattan_distance (s)
+;;   (min (get-box-coords s)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -539,3 +548,59 @@
     (sleep delay)
     );end dolist
   );end defun
+
+
+(defun test-h0 ()
+  (time (a* p1 #'goal-test #'next-states #'h0))
+  (time (a* p2 #'goal-test #'next-states #'h0))
+  (time (a* p3 #'goal-test #'next-states #'h0))
+  (time (a* p4 #'goal-test #'next-states #'h0))
+  (time (a* p5 #'goal-test #'next-states #'h0))
+  (time (a* p6 #'goal-test #'next-states #'h0))
+  (time (a* p7 #'goal-test #'next-states #'h0))
+  (time (a* p8 #'goal-test #'next-states #'h0))
+  (time (a* p9 #'goal-test #'next-states #'h0))
+  (time (a* p10 #'goal-test #'next-states #'h0))
+  (time (a* p11 #'goal-test #'next-states #'h0))
+  (time (a* p12 #'goal-test #'next-states #'h0))
+  (time (a* p13 #'goal-test #'next-states #'h0))
+  (time (a* p14 #'goal-test #'next-states #'h0))
+  (time (a* p15 #'goal-test #'next-states #'h0))
+
+  )
+
+(defun test-h1 ()
+  (time (a* p1 #'goal-test #'next-states #'h1))
+  (time (a* p2 #'goal-test #'next-states #'h1))
+  (time (a* p3 #'goal-test #'next-states #'h1))
+  (time (a* p4 #'goal-test #'next-states #'h1))
+  (time (a* p5 #'goal-test #'next-states #'h1))
+  (time (a* p6 #'goal-test #'next-states #'h1))
+  (time (a* p7 #'goal-test #'next-states #'h1))
+  (time (a* p8 #'goal-test #'next-states #'h1))
+  (time (a* p9 #'goal-test #'next-states #'h1))
+  (time (a* p10 #'goal-test #'next-states #'h1))
+  (time (a* p11 #'goal-test #'next-states #'h1))
+  (time (a* p12 #'goal-test #'next-states #'h1))
+  (time (a* p13 #'goal-test #'next-states #'h1))
+  (time (a* p14 #'goal-test #'next-states #'h1))
+  (time (a* p15 #'goal-test #'next-states #'h1))
+  )
+
+(defun test-hUID ()
+  (time (a* p1 #'goal-test #'next-states #'h704925466))
+  (time (a* p2 #'goal-test #'next-states #'h704925466))
+  (time (a* p3 #'goal-test #'next-states #'h704925466))
+  (time (a* p4 #'goal-test #'next-states #'h704925466))
+  (time (a* p5 #'goal-test #'next-states #'h704925466))
+  (time (a* p6 #'goal-test #'next-states #'h704925466))
+  (time (a* p7 #'goal-test #'next-states #'h704925466))
+  (time (a* p8 #'goal-test #'next-states #'h704925466))
+  (time (a* p9 #'goal-test #'next-states #'h704925466))
+  (time (a* p10 #'goal-test #'next-states #'h704925466))
+  (time (a* p11 #'goal-test #'next-states #'h704925466))
+  (time (a* p12 #'goal-test #'next-states #'h704925466))
+  (time (a* p13 #'goal-test #'next-states #'h704925466))
+  (time (a* p14 #'goal-test #'next-states #'h704925466))
+  (time (a* p15 #'goal-test #'next-states #'h704925466))
+  )
