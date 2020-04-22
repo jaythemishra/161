@@ -301,9 +301,34 @@
 ; The Lisp 'time' function can be used to measure the 
 ; running time of a function call.
 ;
-(defun h704925466 (s) (h1 s))
-;; (defun h704925466 (s) (h_keeper_box_manhattan_distance s))
+;; (defun h704925466 (s) (h1 s))
+(defun h704925466 (s) (box-in-corner s))
 
+(defun box-in-corner-row-util (s row r c)
+  (cond ((= 0 (length row)) nil)
+        ((and (isBox (first row))
+            (let ((left (get-square s r (- c 1)))
+                  (right (get-square s r (+ c 1)))
+                  (up (get-square s (- r 1) c))
+                  (down (get-square s (+ r 1) c)))
+                (or (and (isWall left) (isWall up))
+                    (and (isWall left) (isWall down))
+                    (and (isWall right) (isWall up))
+                    (and (isWall right) (isWall down)))))
+          t)
+        (t (box-in-corner-row-util s (rest row) r (+ 1 c)))))
+
+(defun box-in-corner-util (state s r)
+  (cond ((= 0 (length s)) nil)
+        ((box-in-corner-row-util state (first s) r 0) t)
+        (t (box-in-corner-util state (rest s) (+ 1 r)))))
+
+(defun box-in-corner (s)
+  (cond ((box-in-corner-util s s 0) 100)
+        (t 0)))
+
+;; (defun box-in-row (row)
+;;   (numberp (position box row)))
 
 ;; (defun get-box-coords (s row)
 ;;   (cond ((= 0 (length s)) nil)
@@ -412,14 +437,14 @@
 	    (0 0 0 0 1 4 1)
 	    (0 0 0 0 1 1 1)))
 
-;(?)
+;(51)
 (setq p11 '((0 0 1 0 0 0 0)
 	    (0 2 1 4 0 4 0)
 	    (0 2 0 4 0 0 0)	   
 	    (3 2 1 1 1 4 0)
 	    (0 0 1 4 0 0 0)))
 
-;(?)
+;(41)
 (setq p12 '((1 1 1 1 1 0 0 0)
 	    (1 0 0 4 1 0 0 0)
 	    (1 2 1 0 1 1 1 1)
@@ -429,7 +454,7 @@
 	    (1 1 1 0 3 0 1 0)
 	    (0 0 1 1 1 1 1 0)))
 
-;(?)
+;(78)
 (setq p13 '((1 1 1 1 1 1 1 1 1 1)
 	    (1 3 0 0 1 0 0 4 4 1)
 	    (1 0 2 0 2 0 0 4 4 1)
@@ -437,7 +462,7 @@
 	    (1 0 0 0 0 1 1 4 4 1)
 	    (1 1 1 1 1 1 0 0 0 0)))
 
-;(?)
+;(26)
 (setq p14 '((0 0 0 0 1 0 0 0 0 0 0 1 0 0 0 0)
 	    (0 0 0 0 1 0 0 0 0 0 0 1 0 0 0 0)
 	    (1 1 1 1 1 0 0 0 0 0 0 1 1 1 1 1)
