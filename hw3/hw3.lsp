@@ -301,9 +301,10 @@
 ; The Lisp 'time' function can be used to measure the 
 ; running time of a function call.
 ;
-;; (defun h704925466 (s) (h1 s))
 (defun h704925466 (s) (+ (h1 s) (box-in-corner s)))
 
+;; Checks for boxes bounded by two adjacent walls in a given row
+;; or two adjacent boxes bounded by a wall on one side
 (defun box-in-corner-row-util (s row r c)
   (cond ((= 0 (length row)) nil)
         ((and (isBox (first row))
@@ -333,24 +334,19 @@
             t)
         (t (box-in-corner-row-util s (rest row) r (+ 1 c)))))
 
+;; Checks for boxes row by row
 (defun box-in-corner-util (state s r)
   (cond ((= 0 (length s)) nil)
         ((box-in-corner-row-util state (first s) r 0) t)
         (t (box-in-corner-util state (rest s) (+ 1 r)))))
 
+;; Returns 100 if a box is bounded by a wall on two adjacent sides,
+;; or if two walls are on adjacent squares with walls on the same side of them
+;; (e.g. two boxes next to each other against the left wall of a level)
+;; Returns 0 if neither condition is met
 (defun box-in-corner (s)
   (cond ((box-in-corner-util s s 0) 100)
         (t 0)))
-
-;; (defun box-in-row (row)
-;;   (numberp (position box row)))
-
-;; (defun get-box-coords (s row)
-;;   (cond ((= 0 (length s)) nil)
-;;         (t (append (get-box-coords-row (first s))) (get-box-coords (rest s)))))
-
-;; (defun h_keeper_box_manhattan_distance (s)
-;;   (min (get-box-coords s)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -589,7 +585,7 @@
     );end dolist
   );end defun
 
-
+;; Used to test h0
 (defun test-h0 ()
   (time (a* p1 #'goal-test #'next-states #'h0))
   (time (a* p2 #'goal-test #'next-states #'h0))
@@ -609,6 +605,7 @@
 
   )
 
+;; Used to test h1
 (defun test-h1 ()
   (time (a* p1 #'goal-test #'next-states #'h1))
   (time (a* p2 #'goal-test #'next-states #'h1))
@@ -627,6 +624,7 @@
   (time (a* p15 #'goal-test #'next-states #'h1))
   )
 
+;; Used to test hUID
 (defun test-hUID ()
   (time (a* p1 #'goal-test #'next-states #'h704925466))
   (time (a* p2 #'goal-test #'next-states #'h704925466))
