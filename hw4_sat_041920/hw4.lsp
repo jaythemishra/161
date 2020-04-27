@@ -9,7 +9,9 @@
 ; param n: number of variables in delta
 ; param delta: a CNF represented as a list of lists
 (defun sat? (n delta)
-	...)
+	(print n)
+  (print delta)
+  nil)
 
 
 
