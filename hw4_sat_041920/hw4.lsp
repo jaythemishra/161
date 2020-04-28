@@ -9,11 +9,83 @@
 ; param n: number of variables in delta
 ; param delta: a CNF represented as a list of lists
 (defun sat? (n delta)
-	(print n)
   (print delta)
-  nil)
+  (backtracking n delta '()))
 
+(defun reload()
+  (load "hw4.lsp"))
 
+(defun test1()
+  (solve-cnf "./cnfs/f1/sat_f1.cnf"))
+
+(defun test2()
+  (solve-cnf "./cnfs/f2/sat_f2.cnf"))
+
+(defun test3()
+  (solve-cnf "./cnfs/f3/sat_f3.cnf"))
+
+(defun test4()
+  (solve-cnf "./cnfs/f4/sat_f4.cnf"))
+
+(defun test5()
+  (solve-cnf "./cnfs/f5/sat_f5.cnf"))
+
+(defun simplify (assignment delta)
+  (cond ((= 0 (length delta)) nil)
+        ((simplify-clause assignment (first delta)) (simplify assignment (rest delta)))
+        (t (cons (first delta) (simplify assignment (rest delta)))
+  )))
+
+(defun simplify-clause (assignment clause)
+  (cond ((= 0 (length clause)) nil)
+        (t (let* ((var (first clause))
+                  (value (check-assignment var assignment)))
+              (cond ((and (numberp value) (= value var)) t)
+                    (t (simplify-clause assignment (rest clause))))))))
+
+(defun valid (assignment delta)
+  (cond ((= 0 (length delta)) t)
+        ((= 0 (length (first delta))) nil)
+        (t (let* ((clause (first delta))
+                  (var (first clause))
+                  (value (check-assignment var assignment)))
+              (cond ((or (null value) (= value var))
+                        (valid assignment (rest delta)))
+                    (t (valid assignment (cons (rest clause) (rest delta)))))))))
+
+(defun check-assignment (val assignment)
+  (let ((idx1 (position val assignment))
+        (idx2 (position (- val) assignment)))
+    (cond ((numberp idx1) val)
+          ((numberp idx2) (- val))
+          (t nil))))
+
+(defun backtracking (n delta assignment)
+  (cond ((= n 0) assignment)
+        (t (let* ((var1 n)
+                  (var2 (- var1))
+                  (new-assignment1 (cons var1 assignment))
+                  (new-assignment2 (cons var2 assignment)))
+              (cond ((valid new-assignment1 delta)
+                      (let* ((result1 (backtracking (- n 1)
+                                                    (simplify new-assignment1 delta)
+                                                    new-assignment1)))
+                        (cond ((null result1) 
+                                (cond ((valid new-assignment2 delta)
+                                        (let* ((result2 (backtracking (- n 1)
+                                                                      (simplify new-assignment2 delta)
+                                                                      new-assignment2)))
+                                          (cond ((null result2) nil)
+                                                (t result2))))
+                                      (t nil)))
+                              (t result1))))
+                    (t (cond ((valid new-assignment2 delta)
+                                        (let* ((result2 (backtracking (- n 1)
+                                                                      (simplify new-assignment2 delta)
+                                                                      new-assignment2)))
+                                          (cond ((null result2) nil)
+                                                (t result2))))
+                                      (t nil))))))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
