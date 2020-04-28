@@ -9,33 +9,40 @@
 ; param n: number of variables in delta
 ; param delta: a CNF represented as a list of lists
 (defun sat? (n delta)
-  (print delta)
   (backtracking n delta '()))
 
+;; Reloads file
 (defun reload()
   (load "hw4.lsp"))
 
+;; Tests f1
 (defun test1()
   (solve-cnf "./cnfs/f1/sat_f1.cnf"))
 
+;; Tests f2
 (defun test2()
   (solve-cnf "./cnfs/f2/sat_f2.cnf"))
 
+;; Tests f3
 (defun test3()
   (solve-cnf "./cnfs/f3/sat_f3.cnf"))
 
+;; Tests f4
 (defun test4()
   (solve-cnf "./cnfs/f4/sat_f4.cnf"))
 
+;; Tests f5
 (defun test5()
   (solve-cnf "./cnfs/f5/sat_f5.cnf"))
 
+;; Removes clauses from delta that are already true based on current assignment
 (defun simplify (assignment delta)
   (cond ((= 0 (length delta)) nil)
         ((simplify-clause assignment (first delta)) (simplify assignment (rest delta)))
         (t (cons (first delta) (simplify assignment (rest delta)))
   )))
 
+;; Returns true if the given clause is true based on current assignment
 (defun simplify-clause (assignment clause)
   (cond ((= 0 (length clause)) nil)
         (t (let* ((var (first clause))
@@ -43,6 +50,7 @@
               (cond ((and (numberp value) (= value var)) t)
                     (t (simplify-clause assignment (rest clause))))))))
 
+;; Returns true if the given assignment is valid according to delta
 (defun valid (assignment delta)
   (cond ((= 0 (length delta)) t)
         ((= 0 (length (first delta))) nil)
@@ -53,6 +61,7 @@
                         (valid assignment (rest delta)))
                     (t (valid assignment (cons (rest clause) (rest delta)))))))))
 
+;; Returns the value of a variable if it has already been assigned, nil otherwise
 (defun check-assignment (val assignment)
   (let ((idx1 (position val assignment))
         (idx2 (position (- val) assignment)))
@@ -60,6 +69,7 @@
           ((numberp idx2) (- val))
           (t nil))))
 
+;; The helper function that implements backtrack search
 (defun backtracking (n delta assignment)
   (cond ((= n 0) assignment)
         (t (let* ((var1 n)
