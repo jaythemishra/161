@@ -19,36 +19,47 @@
 ; "node n gets color c" (when there are k possible colors).
 ;
 (defun node2var (n c k)
-  )
+  (+ c (* k (- n 1))))
 
 ; EXERCISE: Fill this function
 ; returns *a clause* for the constraint:
 ; "node n gets at least one color from the set {c,c+1,...,k}."
 ;
 (defun at-least-one-color (n c k)
-  )
+  (cond ((> c k) nil)
+        (t (cons (node2var n c k) (at-least-one-color n (+ 1 c) k)))))
 
 ; EXERCISE: Fill this function
 ; returns *a list of clauses* for the constraint:
 ; "node n gets at most one color from the set {c,c+1,...,k}."
 ;
 (defun at-most-one-color (n c k)
-  )
+  (cond ((= c k) nil)
+        (t (append (get-negative-pairs n c (+ 1 c) k) (at-most-one-color n (+ 1 c) k)))))
+
+;; Helper function for at-most-one-color. Generates all the possible negative
+;; pair clauses between a variable c1 and all variables greater than c1 up to k.
+(defun get-negative-pairs (n c1 c2 k)
+  (cond ((> c2 k) nil)
+        (t (cons (list (- (node2var n c1 k)) (- (node2var n c2 k))) (get-negative-pairs n c1 (+ 1 c2) k)))))
 
 ; EXERCISE: Fill this function
 ; returns *a list of clauses* to ensure that
 ; "node n gets exactly one color from the set {1,2,...,k}."
 ;
 (defun generate-node-clauses (n k)
-  )
+  (cons (at-least-one-color n 1 k) (at-most-one-color n 1 k)))
 
 ; EXERCISE: Fill this function
 ; returns *a list of clauses* to ensure that
 ; "the nodes at both ends of edge e cannot have the same color from the set {1,2,...,k}."
 ;
 (defun generate-edge-clauses (e k)
-  )
+  (edge-clauses (first e) (second e) 1 k))
 
+(defun edge-clauses (x y c k)
+  (cond ((> c k) nil)
+        (t (cons (list (- (node2var x c k)) (- (node2var y c k))) (edge-clauses x y (+ 1 c) k)))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Your exercises end here. Below are top-level
 ; and utility functions that you do not need to understand.
